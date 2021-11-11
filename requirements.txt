@@ -1,0 +1,4 @@
+pyimagej
+numpy
+pyqt >= 5
+scikit-image
