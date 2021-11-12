@@ -57,14 +57,6 @@ if __name__ == '__main__':
         src,
         dst
     ))
-    #
-    # fig, axs = plt.subplots(nrows=2)
-    # axs[0].imshow(astronaut1, cmap='gray')
-    # axs[0].scatter(*zip(*src))
-    # axs[1].imshow(astronaut2, cmap='gray')
-    # axs[1].scatter(*zip(*dst))
-    # fig.show()
-
 
     jo = ij.py.to_dataset(astronaut1)
     a0 = ij.convert().convert(jo, ipClass)
