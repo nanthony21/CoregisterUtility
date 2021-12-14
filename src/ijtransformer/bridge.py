@@ -26,9 +26,7 @@ if __name__ == '__main__':
 
     app = App(im1, im2)
     app.exec()
-    bw = app.getBigWarpWrapper()
-
-    sTransform = bw.getTransform()
+    sTransform = app.getTransform()
 
     iTransform = SimilarityTransform(sTransform._inv_matrix)
     print(iTransform.scale, iTransform.rotation, iTransform.translation)

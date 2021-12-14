@@ -9,7 +9,7 @@ import numpy as np
 
 Point2d = t_.Tuple[float, float]
 
-ij = imagej.init(['net.imagej:imagej', 'net.imagej:imagej-legacy', 'sc.fiji:fiji', 'sc.fiji:bigwarp_fiji:7.0.4'], headless=False)
+ij = imagej.init(['net.imagej:imagej', 'net.imagej:imagej-legacy', 'sc.fiji:fiji', 'sc.fiji:bigwarp_fiji:7.0.5'], headless=False)
 ImagePlusClass = scyjava.jimport("ij.ImagePlus")
 BigWarpInitClass = scyjava.jimport("bigwarp.BigWarpInit")
 BWClass = scyjava.jimport("bigwarp.BigWarp")
@@ -17,33 +17,42 @@ ProgressWriterClass = scyjava.jimport("bdv.ij.util.ProgressWriterIJ")
 
 
 class BigWarpWrapper:
-    def __init__(self, fixedIms: ImageCollection, movingIms: ImageCollection):
+    """
+    Run BigWarp with these two images compared to eachother.
 
-        imPlus1 = ij.convert().convert(ij.py.to_dataset(fixedIms.getDisplayImage()), ImagePlusClass)
-        imPlus2 = ij.convert().convert(ij.py.to_dataset(movingIms.getDisplayImage()), ImagePlusClass)
+    Args:
+        fixedIm: image to compare to.
+        movingIm: image to warp.
+    """
+    def __init__(self, fixedIm: np.ndarray, movingIm: np.ndarray):
+
+        imPlus1 = ij.convert().convert(ij.py.to_dataset(fixedIm), ImagePlusClass)
+        imPlus2 = ij.convert().convert(ij.py.to_dataset(movingIm), ImagePlusClass)
 
         bwData = BigWarpInitClass.initData()
-        BigWarpInitClass.add(bwData, imPlus1, 0, 0, True)
-        BigWarpInitClass.add(bwData, imPlus2, 1, 0, False)
+        BigWarpInitClass.add(bwData, imPlus2, 0, 0, True)  # Signature: ( BigWarpData bwdata, ImagePlus ip, int setupId, int numTimepoints, boolean isMoving )
+        BigWarpInitClass.add(bwData, imPlus1, 1, 0, False)
         bwData.wrapUp()
         # Do I need the new RepeatingReleasedEventsFixer().install(); here?
         progWriter = ProgressWriterClass()
         self._bigWarp = BWClass(bwData, "Big WWWWW", progWriter)
         self._bigWarp.setTransformType("Similarity")  # Allows for scale, translation, and rotation. No shear or perspective
 
-        self._fixedIms = fixedIms
-        self._movingIms = movingIms
+        self._fixedIms = fixedIm
+        self._movingIms = movingIm
 
     def clearPoints(self):
         model = self._bigWarp.getLandmarkPanel().getTableModel()
         model.clear()
 
-    def setPoints(self, movingPoints: t_.Sequence[Point2d], fixedPoints: t_.Sequence[Point2d]):
+    def setPoints(self, fixedPoints: t_.Sequence[Point2d], movingPoints: t_.Sequence[Point2d]):
+        """Add these point pairs to any pre-existing points"""
         assert len(movingPoints) == len(fixedPoints)
         model = self._bigWarp.getLandmarkPanel().getTableModel()
+        startRow = model.getRowCount()
         for row, pointPair in enumerate(zip(movingPoints, fixedPoints)):
             for i in range(2):
-                model.setPoint(row, i % 2 == 0, pointPair[i], None)
+                model.setPoint(startRow + row, i % 2 == 0, pointPair[i], None)
 
     def getTransform(self) -> SimilarityTransform:
         def j2pAffine(affine: 'java class "net.imglib2.realtransform.AffineTransform3D"') -> SimilarityTransform:
@@ -62,8 +71,8 @@ class BigWarpWrapper:
     def close(self):
         self._bigWarp.closeAll()
 
-    def getFixedIms(self) -> ImageCollection:
+    def getFixedIms(self) -> np.ndarray:
         return self._fixedIms
 
-    def getMovingIms(self) -> ImageCollection:
+    def getMovingIms(self) -> np.ndarray:
         return self._movingIms
