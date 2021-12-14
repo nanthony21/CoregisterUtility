@@ -97,8 +97,11 @@ class App(QApplication):
         self._controller.aboutToClose.connect(self._executeOutputs)
         self._controller.show()
 
-    # def getBigWarpWrapper(self):
-    #     return self._bwWrapper
+    @staticmethod
+    def run(fixedIms: ImageCollection, movingIms: ImageCollection, outputStrategy: t_.Sequence[OutputStrategy] = None) -> App:
+        app = App(fixedIms, movingIms, outputStrategy=outputStrategy)
+        app.exec()
+        return app
 
     def getTransform(self) -> SimilarityTransform:
         return self._bwWrapper.getTransform()

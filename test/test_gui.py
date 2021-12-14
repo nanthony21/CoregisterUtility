@@ -29,8 +29,7 @@ def test_gui():
         SaveMatrixOutputStrategy(outPath / 'transform.csv', overwrite=True)
     ]
 
-    app = App(fixedIms, movingIms, outputStrategy=outputs)
-    app.exec()
+    app = App.run(fixedIms, movingIms, outputStrategy=outputs)
     sTransform = app.getTransform()
 
     iTransform = skimage.transform.SimilarityTransform(sTransform._inv_matrix)
