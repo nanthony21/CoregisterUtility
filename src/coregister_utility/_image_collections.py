@@ -1,8 +1,30 @@
 import numpy as np
 import typing as t_
+import abc
 
 
-class ImageCollection:
+class AbstractImageCollection(abc.ABC):
+    """
+    Represents a set of images that all have the same localization. The `displayImage` will be the one shown in a GUI.
+
+    Args:
+        displayImage: The image to show to represent these images.
+        packagedImages: The full set of images that are colocalized. Not including the displayImage.
+    """
+    @abc.abstractmethod
+    def getDisplayImage(self) -> np.ndarray:
+        ...
+
+    @abc.abstractmethod
+    def getPackagedImages(self) -> t_.Sequence[np.ndarray]:
+        ...
+
+    @abc.abstractmethod
+    def getAllImages(self) -> t_.Sequence[np.ndarray]:
+        ...
+
+
+class ImageCollection(AbstractImageCollection):
     """
     Represents a set of images that all have the same localization. The `displayImage` will be the one shown in a GUI.
 

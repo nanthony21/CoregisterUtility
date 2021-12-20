@@ -4,13 +4,13 @@ import os
 import skimage.io
 import skimage.transform as sktransform
 import pathlib as pl
-from ijtransformer.imageCollection import ImageCollection
+from coregister_utility._image_collections import AbstractImageCollection
 import numpy as np
 
 
 class OutputStrategy(abc.ABC):
     @abc.abstractmethod
-    def execute(self, transform: sktransform.ProjectiveTransform, fixed: ImageCollection, moving: ImageCollection):
+    def execute(self, transform: sktransform.ProjectiveTransform, fixed: AbstractImageCollection, moving: AbstractImageCollection):
         ...
 
 
@@ -20,7 +20,7 @@ class SaveWarpedImagesOutputStrategy(OutputStrategy):
         if not self._path.exists():
             self._path.mkdir()
 
-    def execute(self, transform: sktransform.ProjectiveTransform, fixed: ImageCollection, moving: ImageCollection):
+    def execute(self, transform: sktransform.ProjectiveTransform, fixed: AbstractImageCollection, moving: AbstractImageCollection):
         for i, im in enumerate(moving.getAllImages()):
             warped = sktransform.warp(im, transform)
             skimage.io.imsave(self._path / f"{i}.tif", warped)
@@ -33,6 +33,6 @@ class SaveMatrixOutputStrategy(OutputStrategy):
         if not overwrite and self._path.exists():
             raise OSError(f"File {self._path} already exists. Please use `overwrite` = True.")
 
-    def execute(self, transform: sktransform.ProjectiveTransform, fixed: ImageCollection, moving: ImageCollection):
+    def execute(self, transform: sktransform.ProjectiveTransform, fixed: AbstractImageCollection, moving: AbstractImageCollection):
         np.savetxt(self._path, transform.params, delimiter=',')
 

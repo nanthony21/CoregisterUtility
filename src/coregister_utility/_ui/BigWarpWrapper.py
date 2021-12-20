@@ -4,7 +4,6 @@ import typing as t_
 
 from skimage.transform import SimilarityTransform
 
-from src.ijtransformer.imageCollection import ImageCollection
 import numpy as np
 
 Point2d = t_.Tuple[float, float]

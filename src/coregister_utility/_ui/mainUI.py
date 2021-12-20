@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QLabel, QApplication, QHBoxLayout, QFrame
-from skimage.transform import SimilarityTransform
+from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QLabel, QFrame, QHBoxLayout
 
-from ijtransformer.BigWarpWrapper import BigWarpWrapper
-from ijtransformer._featureMatchers import MatcherFactory, FeatureMatcher
-from ijtransformer._outputStrategies import OutputStrategy
-from ijtransformer.imageCollection import ImageCollection
-import typing as t_
+from coregister_utility._featureMatchers import MatcherFactory, FeatureMatcher
+from coregister_utility._ui.BigWarpWrapper import BigWarpWrapper
 
 
 class ControlFrameController:
@@ -83,30 +79,3 @@ class MainController(QObject):
         self._bwWrapper.close()
         self._ui.close()
         self.aboutToClose.emit()
-
-
-class App(QApplication):
-    def __init__(self, fixedIms: ImageCollection, movingIms: ImageCollection, outputStrategy: t_.Sequence[OutputStrategy] = None):
-        super(App, self).__init__([])
-
-        self._outputs = outputStrategy
-        self._fixedIms = fixedIms
-        self._movingIms = movingIms
-        self._bwWrapper = BigWarpWrapper(fixedIms.getDisplayImage(), movingIms.getDisplayImage())
-        self._controller = MainController(self._bwWrapper, MainWidg(), parent=self)
-        self._controller.aboutToClose.connect(self._executeOutputs)
-        self._controller.show()
-
-    @staticmethod
-    def run(fixedIms: ImageCollection, movingIms: ImageCollection, outputStrategy: t_.Sequence[OutputStrategy] = None) -> App:
-        app = App(fixedIms, movingIms, outputStrategy=outputStrategy)
-        app.exec()
-        return app
-
-    def getTransform(self) -> SimilarityTransform:
-        return self._bwWrapper.getTransform()
-
-    def _executeOutputs(self):
-        for out in self._outputs:
-            out.execute(self.getTransform(), self._fixedIms, self._movingIms)
-

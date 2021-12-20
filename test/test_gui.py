@@ -1,10 +1,7 @@
 import skimage
 import skimage.data
 from skimage.transform import AffineTransform
-
-from ijtransformer._outputStrategies import SaveWarpedImagesOutputStrategy, SaveMatrixOutputStrategy
-from ijtransformer.gui import App
-from ijtransformer.imageCollection import ImageCollection
+from coregister_utility import SaveWarpedImagesOutputStrategy, SaveMatrixOutputStrategy, CoregisterUtilityApp, ImageCollection
 import numpy as np
 import pathlib as pl
 
@@ -29,7 +26,7 @@ def test_gui():
         SaveMatrixOutputStrategy(outPath / 'transform.csv', overwrite=True)
     ]
 
-    app = App.run(fixedIms, movingIms, outputStrategy=outputs)
+    app = CoregisterUtilityApp.run(fixedIms, movingIms, outputStrategy=outputs)
     sTransform = app.getTransform()
 
     iTransform = skimage.transform.SimilarityTransform(sTransform._inv_matrix)
