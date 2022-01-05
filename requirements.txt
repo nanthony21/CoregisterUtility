@@ -1,4 +1,0 @@
-pyimagej
-numpy
-pyqt >= 5
-scikit-image >= 0.19

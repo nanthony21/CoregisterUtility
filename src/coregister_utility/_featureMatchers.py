@@ -11,12 +11,27 @@ Point2d = t_.Tuple[float, float]
 
 
 class FeatureMatcher(abc.ABC):
+    """
+    Abstract class for an object that can take two images as input and identify matching points on them.
+    """
     @abc.abstractmethod
     def match(self, im1: np.ndarray, im2: np.ndarray) -> t_.Tuple[t_.Sequence[Point2d], t_.Sequence[Point2d]]:
+        """
+
+        Args:
+            im1: A 2d image
+            im2: Another 2d image
+
+        Returns: Two sets of 2d points of the same length. each point between the two sets should correspond to the same feature in the two input
+            images
+        """
         pass
 
 
 class ORBFeatureMatcher(FeatureMatcher):
+    """
+    A feature matcher that uses scikit-image's ORB algorithm
+    """
     def __init__(self):
         self._orb1 = feature.ORB()
         self._orb2 = feature.ORB()
@@ -38,6 +53,9 @@ class ORBFeatureMatcher(FeatureMatcher):
 
 
 class SIFTFeatureMatcher(FeatureMatcher):
+    """
+    A feature matcher that uses scikit-image's SIFT algorithm
+    """
     def __init__(self):
         self._s1 = feature.SIFT()
         self._s2 = feature.SIFT()
@@ -77,12 +95,17 @@ def ransacPointSelection(src: t_.Sequence[Point2d], dst: t_.Sequence[Point2d]) -
 
 
 class MatcherFactory:
+    """this object is responsible for producing instances of feature matchers"""
     class _Matchers(enum.Enum):
         ORB = enum.auto()
         SIFT = enum.auto()
 
     @staticmethod
     def getMatcherNames() -> t_.Tuple[str]:
+        """
+        Returns:
+            The names of the feature matchers that are available.
+        """
         return tuple(m.name for m in MatcherFactory._Matchers)
 
     @staticmethod
@@ -90,10 +113,10 @@ class MatcherFactory:
         """
 
         Args:
-            name:
+            name: The name of the feature matcher type to fetch
 
         Returns:
-
+            A new instance of a feature matcher
         Raises:
             A valueerror if a featurematcher is not found for the input name.
         """

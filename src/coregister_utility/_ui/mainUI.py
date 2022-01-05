@@ -8,6 +8,12 @@ from coregister_utility._ui.BigWarpWrapper import BigWarpWrapper
 
 
 class ControlFrameController:
+    """
+    The controller for the ControllerFrame widget
+
+    Args:
+        bwWrapper: The object we use to communicate with BigWarp
+    """
     def __init__(self, bwWrapper: BigWarpWrapper, frame: ControlFrame):
         self._wrapper = bwWrapper
         self._ui = frame
@@ -18,15 +24,20 @@ class ControlFrameController:
             matcher = MatcherFactory.getMatcher(name)
             button.released.connect(lambda m=matcher: self._applyMatcherPoints(m))
 
-    def show(self):
-        self._ui.show()
-
     def _applyMatcherPoints(self, matcher: FeatureMatcher):
-        fixed, moving = matcher.match(self._wrapper.getFixedIms(), self._wrapper.getMovingIms())
+        """
+
+        Args:
+            matcher: The feature matcher object to set points on the BigWarp images for.
+        """
+        fixed, moving = matcher.match(self._wrapper.getFixedImage(), self._wrapper.getMovingImage())
         self._wrapper.setPoints(fixed, moving)
 
 
 class ControlFrame(QWidget):
+    """
+    The widget that has buttons to perform feature matching on the images.
+    """
     def __init__(self, parent: QWidget):
         super().__init__(parent=parent)
 
@@ -50,6 +61,9 @@ class ControlFrame(QWidget):
 
 
 class MainWidg(QWidget):
+    """
+    This is the top level Python widget that will pop up as a window.
+    """
     def __init__(self):
         super().__init__(parent=None)
 
@@ -63,19 +77,30 @@ class MainWidg(QWidget):
 
 
 class MainController(QObject):
+    """
+    This is the controller for the Main Python Widget.
+
+    Args:
+        bwWrapper: The object that helps us control the BigWarp plugin for ImageJ
+    """
     aboutToClose = pyqtSignal()
 
-    def __init__(self, bwWrapper: BigWarpWrapper, widg: MainWidg, parent=None):
+    def __init__(self, bwWrapper: BigWarpWrapper, parent=None):
         super(MainController, self).__init__(parent=parent)
-        self._ui = widg
+        self._ui = MainWidg()
         self._bwWrapper = bwWrapper
         self._ui._okButton.released.connect(self.close)
         self._controller = ControlFrameController(bwWrapper, self._ui._cFrame)
 
     def show(self):
+        """
+        Show the user interface.
+        """
         self._ui.show()
 
     def close(self):
-        self._bwWrapper.close()
+        """
+        Close the user interface and clean up other resources.
+        """
         self._ui.close()
         self.aboutToClose.emit()

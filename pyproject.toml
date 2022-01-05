@@ -1,9 +1,11 @@
 [build-system]
 # Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel", "setuptools_scm"]  # PEP 508 specifications.
+requires = [
+    "setuptools",
+    "wheel"]  # PEP 508 specifications.
 
 [project.optional-dependencies]
-tests = [
+test = [
     'pytest>=6',
 ]
 
@@ -12,4 +14,20 @@ minversion = "6.0"
 addopts = "-ra"
 testpaths = [
     "tests"
+]
+
+[project]
+name = "CoregisterUtility"
+authors = [
+    {name = "Nick Anthony", email = "nickmanthony@hotmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.7"
+dynamic = ["version", "description"]
+
+dependencies = [
+    "pyimagej",
+    "numpy",
+    "pyqt >= 5",
+    "scikit-image >= 0.19"
 ]

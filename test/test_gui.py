@@ -7,6 +7,10 @@ import pathlib as pl
 
 
 def test_gui():
+    """
+    Test running the application and saving warped images as well as the matrix CSV
+
+    """
     astronaut1 = skimage.data.astronaut().mean(axis=2).astype(np.uint8)
     tForm = AffineTransform(scale=0.7, rotation=.2, translation=(100, 100)).inverse
     astronaut2 = skimage.transform.warp(astronaut1, tForm)
